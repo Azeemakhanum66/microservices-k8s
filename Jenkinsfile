@@ -1,21 +1,20 @@
-pipeline {
+// pipeline {
     agent any
 
     stages {
-        stage('Deploy To Kubernetes') {
+        stage('Deploy to Local Kubernetes') {
             steps {
-                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'EKS-1', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://9F39F577334FF23706994135261985F2.gr7.ap-south-1.eks.amazonaws.com']]) {
-                    sh "kubectl apply -f deployment-service.yml"
-                    
-                }
+                sh 'kubectl apply -f k8s/deployment-service.yml'
+                sh 'kubectl apply -f k8s/productcatalogservice-deployment.yaml'
+                sh 'kubectl apply -f k8s/adservice-deployment.yaml'
+                sh 'kubectl apply -f k8s/frontend-deployment.yaml'
             }
         }
-        
-        stage('verify Deployment') {
+
+        stage('Verify Deployment') {
             steps {
-                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'EKS-1', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://9F39F577334FF23706994135261985F2.gr7.ap-south-1.eks.amazonaws.com']]) {
-                    sh "kubectl get svc -n webapps"
-                }
+                sh 'kubectl get pods'
+                sh 'kubectl get svc'
             }
         }
     }
